@@ -2,6 +2,10 @@ import {
   supplier_name,
   type SupplierName,
 } from "src/pcb/properties/supplier_name"
+import {
+  cutout_aperture,
+  type CutoutAperture,
+} from "src/source/properties/cutout_aperture"
 import { expectTypesMatch } from "src/utils/expect-types-match"
 import { z } from "zod"
 
@@ -14,6 +18,7 @@ export interface SourceComponentBase {
   supplier_part_numbers?: Partial<Record<SupplierName, string[]>>
   display_value?: string
   display_name?: string
+  cutout_aperture?: CutoutAperture
   are_pins_interchangeable?: boolean
   internally_connected_source_port_ids?: string[][]
   source_group_id?: string
@@ -31,6 +36,7 @@ export const source_component_base = z.object({
     .optional(),
   display_value: z.string().optional(),
   display_name: z.string().optional(),
+  cutout_aperture: cutout_aperture.optional(),
   are_pins_interchangeable: z.boolean().optional(),
   internally_connected_source_port_ids: z.array(z.array(z.string())).optional(),
   source_group_id: z.string().optional(),

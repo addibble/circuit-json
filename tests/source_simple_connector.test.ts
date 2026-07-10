@@ -36,6 +36,30 @@ test("source_simple_connector parses with m2 standard", () => {
   expect(connector.standard).toBe("m2")
 })
 
+test("source_simple_connector parses optional cutout aperture dimensions", () => {
+  const connector = source_simple_connector.parse({
+    type: "source_component",
+    ftype: "simple_connector",
+    source_component_id: "connector-aperture",
+    name: "J4",
+    cutout_aperture: {
+      shape: "rounded_rect",
+      width_mm: 3.66,
+      height_mm: 8.34,
+      corner_radius_mm: 1.83,
+      z_center_above_board_mm: 6.75,
+    },
+  })
+
+  expect(connector.cutout_aperture).toEqual({
+    shape: "rounded_rect",
+    width_mm: 3.66,
+    height_mm: 8.34,
+    corner_radius_mm: 1.83,
+    z_center_above_board_mm: 6.75,
+  })
+})
+
 test("source_simple_connector rejects invalid standard", () => {
   expect(() =>
     source_simple_connector.parse({
