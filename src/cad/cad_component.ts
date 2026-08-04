@@ -38,6 +38,12 @@ export const cad_component = z
         'The direction in the model\'s coordinate space that is considered "up" or "coming out of the board surface"',
       ),
     model_origin_position: point3.optional(),
+    model_bounds: z
+      .object({ min: point3, max: point3 })
+      .optional()
+      .describe(
+        "Axis-aligned extent of the model measured in its own coordinate frame -- the same frame as model_origin_position, with model_board_normal_direction naming the axis that leaves the board (default z+). Because model_origin_position is the point placed on the board surface, a consumer can split the model about that surface without loading the mesh: for a positive normal the outward reach is max[axis] - origin[axis], and for a negative one it is origin[axis] - min[axis]. `size` cannot do this: it carries the extent but not where the box sits relative to the origin, and the box is generally not centered on it. These bounds are the model's own, before model_unit_to_mm_scale_factor and model_object_fit scaling are applied.",
+      ),
     model_origin_alignment: z
       .enum([
         "unknown",
@@ -89,6 +95,7 @@ export interface CadComponent {
   model_unit_to_mm_scale_factor?: number
   model_board_normal_direction?: CadModelAxisDirection
   model_origin_position?: Point3
+  model_bounds?: { min: Point3; max: Point3 }
   model_origin_alignment?:
     | "unknown"
     | "center"

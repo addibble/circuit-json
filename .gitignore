@@ -5,3 +5,5 @@ package-lock.json
 .aider*
 .env
 opencode
+.yalc
+yalc.lock
