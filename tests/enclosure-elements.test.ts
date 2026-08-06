@@ -100,11 +100,13 @@ test("parses generated FDM enclosure CAD", () => {
     cad_fdm_enclosure_id: "cad_enclosure_base",
     source_fdm_enclosure_id: "enclosure_1",
     name: "base",
+    enclosure_part: "base",
     position: { x: "0mm", y: "0mm", z: "0mm" },
     size: { x: "44mm", y: "34mm", z: "12mm" },
     model_jscad: { type: "cube", size: [44, 34, 12] },
   })
 
+  expect(parsed.enclosure_part).toBe("base")
   expect(parsed.position).toEqual({ x: 0, y: 0, z: 0 })
   expect(parsed.size).toEqual({ x: 44, y: 34, z: 12 })
   expect(parsed.model_jscad).toEqual({ type: "cube", size: [44, 34, 12] })
@@ -134,6 +136,7 @@ test("all enclosure and assembly elements are accepted by any_circuit_element", 
       type: "cad_fdm_enclosure",
       cad_fdm_enclosure_id: "cad_enclosure_1",
       source_fdm_enclosure_id: "enclosure_1",
+      enclosure_part: "lid",
       position: { x: 0, y: 0, z: 0 },
     },
   ]

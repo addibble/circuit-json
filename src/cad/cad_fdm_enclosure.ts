@@ -8,6 +8,16 @@ export const cad_fdm_enclosure = z
     cad_fdm_enclosure_id: z.string(),
     source_fdm_enclosure_id: z.string(),
     name: z.string().optional(),
+    /**
+     * Which piece of the enclosure this record is.
+     *
+     * One record per printed part, not one per enclosure: the pieces are made,
+     * handled and inspected separately, and a viewer needs to address them
+     * separately -- hiding the lid to see the board is the single most common
+     * thing anyone does with an enclosure on screen. The set grows with the
+     * process (fasteners, inserts, brackets); it is not a rendering hint.
+     */
+    enclosure_part: z.enum(["base", "lid"]),
     position: point3,
     rotation: point3.optional(),
     size: point3.optional(),
@@ -22,26 +32,21 @@ export const cad_fdm_enclosure = z
     model_unit_to_mm_scale_factor: z.number().optional(),
     /** Serialized JSCAD operation tree describing this part's geometry. */
     model_jscad: z.any().optional(),
-    /**
-     * Render this part see-through. Set per part, not per enclosure: a lid or
-     * shell half is usually shown translucent so the board and mounting
-     * hardware inside stay visible, while the part being inspected is opaque.
-     */
-    show_as_translucent_model: z.boolean().optional(),
   })
-  .describe("Defines generated CAD output for an FDM enclosure")
+  .describe("Defines generated CAD output for an FDM enclosure part")
 
 export type CadFdmEnclosureInput = z.input<typeof cad_fdm_enclosure>
 type InferredCadFdmEnclosure = z.infer<typeof cad_fdm_enclosure>
 
 /**
- * Defines generated CAD output for an FDM enclosure.
+ * Defines generated CAD output for one part of an FDM enclosure.
  */
 export interface CadFdmEnclosure {
   type: "cad_fdm_enclosure"
   cad_fdm_enclosure_id: string
   source_fdm_enclosure_id: string
   name?: string
+  enclosure_part: "base" | "lid"
   position: Point3
   rotation?: Point3
   size?: Point3
@@ -55,7 +60,6 @@ export interface CadFdmEnclosure {
   model_asset?: Asset
   model_unit_to_mm_scale_factor?: number
   model_jscad?: any
-  show_as_translucent_model?: boolean
 }
 
 expectTypesMatch<CadFdmEnclosure, InferredCadFdmEnclosure>(true)
