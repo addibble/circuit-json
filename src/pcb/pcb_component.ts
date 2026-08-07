@@ -72,6 +72,23 @@ export const pcb_component = z
     positioned_relative_to_pcb_board_id: z.string().optional(),
     cable_insertion_center: point.optional(),
     insertion_direction: insertion_direction.optional(),
+    /**
+     * Direction this part's enclosure opening faces, in board coordinates.
+     *
+     * Distinct from `insertion_direction`, and a part may carry both: a
+     * side-actuated switch is installed from above and actuated from the side,
+     * so its opening pierces a side wall while nothing is ever inserted into it.
+     * `insertion_direction` is documented as the side exposing the receptacle a
+     * cable attaches to, which is not what an actuator does.
+     *
+     * Same vocabulary and the same frame as `insertion_direction`: authored on
+     * the footprint in the part's unrotated frame, reported here rotated and
+     * mirrored for how the component was actually placed.
+     *
+     * Absent means the opening faces the way the part is entered, which is
+     * correct for every connector.
+     */
+    cutout_aperture_direction: insertion_direction.optional(),
     pin1_location: pcb_pin1_location
       .optional()
       .describe(
@@ -129,6 +146,7 @@ export interface PcbComponent {
   positioned_relative_to_pcb_board_id?: string
   cable_insertion_center?: Point
   insertion_direction?: InsertionDirection
+  cutout_aperture_direction?: InsertionDirection
   pin1_location?: PcbPin1Location
   supplier_pin1_location_map?: SupplierPin1LocationMap
   metadata?: PcbComponentMetadata
