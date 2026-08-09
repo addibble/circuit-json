@@ -4,19 +4,15 @@ import { expectTypesMatch } from "src/utils/expect-types-match"
 import { z } from "zod"
 
 /**
- * Every aperture dimension is named `aperture_*` and is measured in the frame of
- * the enclosure face it pierces, never in board or enclosure axes, because the
- * same opening maps to different world axes on different faces:
+ * Aperture dimensions describe a cutting tool around the part's interaction
+ * axis, not the enclosure's board-aligned width/height/depth. On a side opening,
+ * `height` is board Z, `width` is perpendicular to the interaction axis in the
+ * board plane, and `depth` follows that axis inboard. On a lid or floor opening,
+ * width and height rotate in-plane with the part and depth is vertical. A circle
+ * uses `radius` for its profile.
  *
- * | Face | `width` | `height` | `depth` |
- * | --- | --- | --- | --- |
- * | `x_pos`, `x_neg` | Y | Z | X |
- * | `y_pos`, `y_neg` | X | Z | Y |
- * | `z_pos`, `z_neg` | part-local | part-local | Z |
- *
- * So on any side face `height` is the vertical (board Z) dimension and
- * `width` runs along the wall. The prefix keeps these distinct from an
- * enclosure's own width/height/depth, which are plain X/Y/Z.
+ * Core derives the axis from the owning footprint's cutout/insertion direction;
+ * it is intentionally not duplicated on this shape-only source record.
  */
 const source_cutout_aperture_base = z.object({
   type: z.literal("source_cutout_aperture"),

@@ -149,6 +149,7 @@ https://github.com/user-attachments/assets/2f28b7ba-689e-4d80-85b2-5bdef84b41f8
     - [PcbPadTraceClearanceError](#pcbpadtraceclearanceerror)
     - [PcbPanel](#pcbpanel)
     - [PcbPanelizationPlacementError](#pcbpanelizationplacementerror)
+    - [PcbPin1Location](#pcbpin1location)
     - [PcbPlacementError](#pcbplacementerror)
     - [PcbPlatedHole](#pcbplatedhole)
     - [PcbPort](#pcbport)
@@ -589,7 +590,7 @@ interface SourceManuallyPlacedVia {
   type: "source_manually_placed_via"
   source_manually_placed_via_id: string
   source_group_id: string
-  source_net_id: string
+  source_net_id?: string
   subcircuit_id?: string
   source_trace_id?: string
 }
@@ -1388,6 +1389,7 @@ interface CadComponent {
   model_unit_to_mm_scale_factor?: number
   model_board_normal_direction?: CadModelAxisDirection
   model_origin_position?: Point3
+  model_bounds?: { min: Point3; max: Point3 }
   model_origin_alignment?:
     | "unknown"
     | "center"
@@ -1405,15 +1407,16 @@ interface CadComponent {
 
 [Source](https://github.com/tscircuit/circuit-json/blob/main/src/cad/cad_fdm_enclosure.ts)
 
-Defines generated CAD output for an FDM enclosure.
+Defines generated CAD output for one part of an FDM enclosure.
 
 ```typescript
-/** Defines generated CAD output for an FDM enclosure. */
+/** Defines generated CAD output for one part of an FDM enclosure. */
 interface CadFdmEnclosure {
   type: "cad_fdm_enclosure"
   cad_fdm_enclosure_id: string
   source_fdm_enclosure_id: string
   name?: string
+  enclosure_part: "base" | "lid"
   position: Point3
   rotation?: Point3
   size?: Point3
@@ -1427,7 +1430,6 @@ interface CadFdmEnclosure {
   model_asset?: Asset
   model_unit_to_mm_scale_factor?: number
   model_jscad?: any
-  show_as_translucent_model?: boolean
 }
 ```
 
@@ -1510,6 +1512,8 @@ interface PcbBreakoutPoint {
 interface PcbComponentMetadata {
   kicad_footprint?: KicadFootprintMetadata
 }
+
+type SupplierPin1LocationMap = Partial<Record<SupplierName, PcbPin1Location>>
 ```
 
 ### PcbComponentInvalidLayerError
@@ -2324,6 +2328,24 @@ interface PcbPanelizationPlacementError extends BaseCircuitJsonError {
 }
 ```
 
+### PcbPin1Location
+
+[Source](https://github.com/tscircuit/circuit-json/blob/main/src/pcb/properties/pcb_pin1_location.ts)
+
+```typescript
+type PcbPin1Location =
+  | "leftside_top"
+  | "leftside_bottom"
+  | "rightside_top"
+  | "rightside_bottom"
+  | "topside_left"
+  | "topside_right"
+  | "bottomside_left"
+  | "bottomside_right"
+
+type PcbPin1LocationRotation = 0 | 90 | 180 | 270
+```
+
 ### PcbPlacementError
 
 [Source](https://github.com/tscircuit/circuit-json/blob/main/src/pcb/pcb_placement_error.ts)
@@ -2949,6 +2971,8 @@ interface PcbVia {
   to_layer?: LayerRef
   layers: LayerRef[]
   pcb_trace_id?: string
+  source_trace_id?: string
+  source_net_id?: string
   net_is_assignable?: boolean
   net_assigned?: boolean
   is_tented?: boolean
@@ -3504,6 +3528,12 @@ interface SchematicText {
   schematic_component_id?: string
   schematic_symbol_id?: string
   schematic_text_id: string
+  /** Set when the text annotates a trace rather than a component, as an inline
+   * net label does - the net name drawn alongside a point-to-point wire instead
+   * of as an anchored `schematic_net_label`. Lets consumers tell such a label
+   * apart from free-standing text and resolve the net it belongs to. */
+
+  source_trace_id?: string
   text: string
   font_size: number
   position: {
